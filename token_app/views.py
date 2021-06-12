@@ -8,6 +8,7 @@ import string
 import datetime
 import time
 import threading
+from django.db.models import Q
 
 def get_random_token():
     random_source = string.ascii_letters + string.digits + string.punctuation
@@ -33,7 +34,7 @@ def release_token_in_sixty_sec(tid):
     time.sleep(60)
     print(f'Release token in sixty_sec {tid} is running')
     token=Token.objects.get(id=int(tid))
-    if token and token.is_assigned_alive ==False:
+    if token and token.is_alive ==False:
         token.is_assigned = False
         token.save()
 
@@ -71,7 +72,7 @@ def generate_token(req,):
 @renderer_classes((JSONRenderer,))
 def assign_token(req,):
     if req.method=='PUT':
-        if Token.objects.filter(is_assigned = False):
+        if Token.objects.filter(is_assigned = False,is_alive=False):
             token = Token.objects.filter(is_assigned = False).first()
             token.is_assigned = True
             token.assigned_at = datetime.datetime.now()
@@ -79,19 +80,22 @@ def assign_token(req,):
             tid=token.id
             threading.Thread(target=release_token_in_sixty_sec,args=[tid]).start()
             return Response(f'status :   token {tid} assigned successfully',)
+
+        return Response('bad request!', 404)
     return Response('bad request!', 404)
 
 @api_view(['PUT'])
 @renderer_classes((JSONRenderer,))
 def unassign_token(req,tid):
     if req.method=='PUT':
-        token = Token.objects.get(id=tid)
+        token = Token.objects.filter(id=tid).first()
         if token:
             token.is_assigned=False
             token.save()
             ide=token.id
             #threading.Thread(target=unblock_token, args=[ide]).start()
             return Response(f'status : token {ide} unassigned successfully',)
+        return Response('bad request!', 404)
     return Response('bad request!', 404)
 
 @api_view(['DELETE'])
@@ -104,7 +108,8 @@ def delete_token(req, tid):
         if tokens:
             tokens.delete()
             return Response(f'status:  token {tid} deleted sucessfully')
-    return Response(f'No Token {tid} available')
+        return Response('bad request!', 404)
+    return Response('bad request!', 404)
 
 @api_view(['PUT'])
 @renderer_classes((JSONRenderer,))
@@ -112,13 +117,13 @@ def keep_alive_token(req,tid):
     if req.method == 'PUT':
         jsondata = req.data
         print(jsondata)
-        #token_not_alive_count =Token.objects.filter(id=int(tid))
-        token = Token.objects.get(id=tid)
+        token = Token.objects.filter(id=tid).first()
         if token:
             token.created_time = datetime.datetime.now()
             token.is_alive = True
             token.save()
             return Response(f'status:   token id {tid} is alive')
+        return Response('bad request!', 404)
     return Response('bad request!', 404)
 
 @api_view(['PUT'])
@@ -127,10 +132,10 @@ def keep_assign_alive_token(req,tid):
     if req.method == 'PUT':
         jsondata = req.data
         print(jsondata)
-        #token_not_alive_count =Token.objects.filter(id=int(tid))
-        token = Token.objects.get(id=int(tid))
+        token = Token.objects.filter(id=int(tid)).first()
         if token:
-            token.is_assigned_alive = True
+            token.assigned_alive = True
             token.save()
             return Response(f'status:   token  {tid} is assigned alive')
+        return Response('bad request!', 404)
     return Response('bad request!', 404)

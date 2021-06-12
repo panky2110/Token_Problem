@@ -1,0 +1,4 @@
+Django==2.2.7
+djangorestframework==3.12.2
+Postman==8.0.5
+mysql==8.0.22.0

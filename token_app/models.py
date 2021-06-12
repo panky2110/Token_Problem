@@ -9,11 +9,12 @@ class Token(models.Model):
     is_assigned = models.BooleanField(default=False)
     assigned_at = models.DateTimeField(default=timezone.now())
     unassigned_at = models.DateTimeField(default=timezone.now())
-    is_assigned_alive=models.BooleanField(default=False)
-    alive_alive_at = models.DateTimeField(default=timezone.now())
+    assigned_alive=models.BooleanField(default=False)
     is_alive = models.BooleanField(default=False)
     alive_at = models.DateTimeField(default=timezone.now())
+
     class Meta:
         db_table='Token'
+
 
 
