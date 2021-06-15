@@ -75,12 +75,13 @@ def assign_token(req,):
     if req.method=='PUT':
         if Token.objects.filter(is_alive=False).first():
             token = Token.objects.filter(is_assigned = False).first()
-            token.is_assigned = True
-            token.assigned_at = datetime.datetime.now()
-            token.save()
-            tid=token.id
-            threading.Thread(target=release_token_in_sixty_sec,args=[tid]).start()
-            return Response(f'status :   token {tid} assigned successfully',)
+            if token:
+                token.is_assigned = True
+                token.assigned_at = datetime.datetime.now()
+                token.save()
+                tid=token.id
+                threading.Thread(target=release_token_in_sixty_sec,args=[tid]).start()
+                return Response(f'status :   token {tid} assigned successfully',)
 
         return Response('bad request!', 404)
     return Response('bad request!', 404)
