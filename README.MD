@@ -8,7 +8,7 @@
 8.Run Command in cmd manage.py runserver
 9.Set the method 'POST' and hit the url http://localhost:8000/gnerate_token on the Postman.
 10.Set the method 'PUT' and hit the url http://localhost:8000/assign in 1 minute to keep assign with generated token 
-12 Set the method 'PUT' and hit the url http://localhost:8000/keep_alive/tid in 5 minute,take tid from in status code from
+12 Set the method 'PUT' and hit the url http://localhost:8000/keep_alive/tid after 5 minute,take tid from in status code from
 assign tid and 
 13.Set the method 'PUT' and it Hit the url http://localhost:8000/keep_assign/tid to keep assign alive token   
 14.Set the method 'PUT' and hit Hit the url http://localhost:8000/unassign to unassign the token.

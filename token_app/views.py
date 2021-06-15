@@ -72,7 +72,7 @@ def generate_token(req,):
 @renderer_classes((JSONRenderer,))
 def assign_token(req,):
     if req.method=='PUT':
-        if Token.objects.filter(is_assigned = False,is_alive=False):
+        if Token.objects.filter(is_alive=False).first():
             token = Token.objects.filter(is_assigned = False).first()
             token.is_assigned = True
             token.assigned_at = datetime.datetime.now()
@@ -88,13 +88,14 @@ def assign_token(req,):
 @renderer_classes((JSONRenderer,))
 def unassign_token(req,tid):
     if req.method=='PUT':
-        token = Token.objects.filter(id=tid).first()
-        if token:
-            token.is_assigned=False
-            token.save()
-            ide=token.id
-            #threading.Thread(target=unblock_token, args=[ide]).start()
-            return Response(f'status : token {ide} unassigned successfully',)
+        if Token.objects.filter(is_alive=False).first():
+            token = Token.objects.filter(id=tid).first()
+            if token:
+                token.is_assigned=False
+                token.save()
+                ide=token.id
+                #threading.Thread(target=unblock_token, args=[ide]).start()
+                return Response(f'status : token {ide} unassigned successfully',)
         return Response('bad request!', 404)
     return Response('bad request!', 404)
 
@@ -117,12 +118,13 @@ def keep_alive_token(req,tid):
     if req.method == 'PUT':
         jsondata = req.data
         print(jsondata)
-        token = Token.objects.filter(id=tid).first()
-        if token:
-            token.created_time = datetime.datetime.now()
-            token.is_alive = True
-            token.save()
-            return Response(f'status:   token id {tid} is alive')
+        if Token.objects.filter(is_alive=False).first():
+            token = Token.objects.filter(id=tid).first()
+            if token:
+                token.created_time = datetime.datetime.now()
+                token.is_alive = True
+                token.save()
+                return Response(f'status:   token id {tid} is alive')
         return Response('bad request!', 404)
     return Response('bad request!', 404)
 
@@ -132,10 +134,11 @@ def keep_assign_alive_token(req,tid):
     if req.method == 'PUT':
         jsondata = req.data
         print(jsondata)
-        token = Token.objects.filter(id=int(tid)).first()
-        if token:
-            token.assigned_alive = True
-            token.save()
-            return Response(f'status:   token  {tid} is assigned alive')
+        if Token.objects.filter(assigned_alive=False).first():
+            token = Token.objects.filter(id=int(tid)).first()
+            if token:
+                token.assigned_alive = True
+                token.save()
+                return Response(f'status:   token  {tid} is assigned alive')
         return Response('bad request!', 404)
     return Response('bad request!', 404)
