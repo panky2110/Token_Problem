@@ -63,6 +63,7 @@ def generate_token(req,):
         print(jsondata)
         token = get_random_token()
         token_obj = Token(token_name=str(token))
+        token_obj.created_time=datetime.datetime.now()
         token_obj.save()
         token_obj.refresh_from_db()
         threading.Thread(target=delete_token_five_min,args=[token_obj.id]).start()
@@ -121,7 +122,6 @@ def keep_alive_token(req,tid):
         if Token.objects.filter(is_alive=False).first():
             token = Token.objects.filter(id=tid).first()
             if token:
-                token.created_time = datetime.datetime.now()
                 token.is_alive = True
                 token.save()
                 return Response(f'status:   token id {tid} is alive')

@@ -8,10 +8,9 @@ class Token(models.Model):
     token_name = models.CharField(max_length=80, unique=True, db_index=True)
     is_assigned = models.BooleanField(default=False)
     assigned_at = models.DateTimeField(default=timezone.now())
-    unassigned_at =models.DateTimeField(default=timezone.now())
     assigned_alive=models.BooleanField(default=False)
     is_alive = models.BooleanField(default=False)
-    alive_at = models.DateTimeField(default=timezone.now())
+
 
     class Meta:
         db_table='Token'
